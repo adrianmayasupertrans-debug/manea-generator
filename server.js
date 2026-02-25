@@ -19,7 +19,7 @@ function createLyrics(words, style) {
     return `
 Te-am iubit prin ${words[0]}
 Mi-ai lăsat ${randomWord} în suflet
-Plâng noaptea pentru ${words[1]}
+Plâng noaptea pentru ${words[1] || words[0]}
 
 Refren:
 ${hook}
@@ -33,7 +33,7 @@ Fără tine nu-mi e bine
     return `
 Am pornit de jos cu ${words[0]}
 Toți râdeau de ${randomWord}
-Acum număr ${words[1]}
+Acum număr ${words[1] || words[0]}
 
 Refren:
 ${hook}
@@ -58,7 +58,7 @@ Dușmanii ard de rușine
   }
 
   return `
-Am simțit ${words[0]} în noapte
+Am simțit ${words[0]}
 Viața m-a lovit cu ${randomWord}
 
 Refren:
@@ -72,7 +72,8 @@ Din durere construiesc
 app.post("/generate", async (req, res) => {
   try {
     const { text, style, preview } = req.body;
-    const words = text.trim().split(/\s+/);
+
+    const words = text.trim().split(/\s+/); // 🔥 fără limită
 
     const lyrics = createLyrics(words, style);
 
@@ -107,4 +108,6 @@ app.post("/generate", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 3000, () => {
+  console.log("Server running on http://localhost:3000");
+});

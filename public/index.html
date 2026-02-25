@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Manea Generator</title>
+</head>
+<body>
+<h1>Scrie 3 cuvinte</h1>
+<input type="text" id="words" />
+<button onclick="generate()">Generează</button>
+
+<script>
+async function generate() {
+  const text = document.getElementById("words").value;
+
+  const res = await fetch("/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
+  });
+
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "manea.mp3";
+  a.click();
+}
+</script>
+</body>
+</html>

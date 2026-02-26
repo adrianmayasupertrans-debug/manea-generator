@@ -1,13 +1,39 @@
-{
-  "name": "manea-generator",
-  "version": "1.0.0",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2",
-    "fluent-ffmpeg": "^2.1.3",
-    "ffmpeg-static": "^5.1.0"
+const express = require("express");
+const path = require("path");
+const ffmpeg = require("fluent-ffmpeg");
+const ffmpegPath = require("ffmpeg-static");
+
+ffmpeg.setFfmpegPath(ffmpegPath);
+
+const app = express();
+app.use(express.json());
+app.use(express.static("public"));
+
+app.post("/generate", async (req, res) => {
+  try {
+    const { preview } = req.body;
+
+    const outputPath = path.join(__dirname, preview ? "preview.mp3" : "full.mp3");
+
+    // Generăm beat simplu (ton ritmic)
+    await new Promise((resolve, reject) => {
+      ffmpeg()
+        .input("sine=frequency=440:sample_rate=44100")
+        .inputOptions(["-f lavfi"])
+        .duration(preview ? 10 : 25)
+        .audioFilters("volume=0.5")
+        .save(outputPath)
+        .on("end", resolve)
+        .on("error", reject);
+    });
+
+    res.download(outputPath);
+
+  } catch (err) {
+    res.status(500).send("Audio generation error");
   }
-}
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log("Server running...");
+});
